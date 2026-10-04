@@ -126,6 +126,10 @@ function rhythmSection(): HTMLElement {
   zone.value = prefs.schoolZone;
   zone.addEventListener("change", async () => st.show(await savePrefs({ schoolZone: zone.value as Prefs["schoolZone"] })));
 
+  const city = h("input", { type: "text", placeholder: "ex. ta ville", spellcheck: "false", style: "flex:1 1 auto;min-width:0" }) as HTMLInputElement;
+  city.value = prefs.ville;
+  city.addEventListener("change", async () => st.show(await savePrefs({ ville: city.value.trim() })));
+
   return h(
     "section",
     {},
@@ -137,7 +141,8 @@ function rhythmSection(): HTMLElement {
     h("div", { class: "row" }, h("label", { text: "Récap du soir" }), recap, h("span", { class: "hint", text: "les jours de travail" })),
     h("div", { class: "col" }, h("label", { text: "Mes plateformes de jeu" }), listField(prefs.platforms, "PS5, Switch, PC…", "platforms")),
     h("div", { class: "col" }, h("label", { text: "Mes services de streaming" }), listField(prefs.streaming, "Netflix, Disney+…", "streaming")),
-    h("div", { class: "row" }, h("label", { text: "Zone scolaire" }), zone, st.el),
+    h("div", { class: "row" }, h("label", { text: "Zone scolaire" }), zone),
+    h("div", { class: "row" }, h("label", { text: "Ville (météo)" }), city, h("span", { class: "hint", text: "vide = pas de météo" }), st.el),
   );
 }
 
