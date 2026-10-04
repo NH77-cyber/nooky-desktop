@@ -120,8 +120,16 @@ class AppState {
     for (const fn of this.listeners) fn();
   }
 
+  /** Quiet for a while → Nooky dozes off (sooner at night). */
+  get sleepy(): boolean {
+    const idle = performance.now() - this.lastActivity;
+    const h = new Date().getHours();
+    const night = h >= 23 || h < 6;
+    return idle > (night ? 2 * 60_000 : 10 * 60_000);
+  }
+
   get effectiveState(): BotStateName {
-    return this.stateOverride ?? "idle";
+    return this.stateOverride ?? (this.sleepy ? "sleeping" : "idle");
   }
 
   defaultView(): IslandViewName {
