@@ -80,6 +80,10 @@ async function main() {
       case "update":
         void runUpdateCheck(island, true);
         break;
+      case "shortcut":
+        State.paused = false;
+        island.alert("prompt");
+        break;
       case "pause":
         State.paused = !State.paused;
         if (State.paused) island.fsm.forceHidden();
