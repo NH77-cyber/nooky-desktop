@@ -17,6 +17,11 @@ import type { BotEmoteName, BotStateName } from "../core/layout";
 
 export type EyeShape = "rond" | "content" | "dodo" | "agace" | "mi" | "spirale" | "grand" | "clin";
 export type MouthShape = "parle" | "o" | "sourire" | "moue" | "baille" | "plat";
+/** Faint idle tint per weekday (Sun…Sat). */
+const MOOD: readonly RGB[] = [
+  [255, 190, 150], [150, 190, 255], [170, 235, 190], [255, 220, 150], [200, 170, 255], [255, 170, 200], [170, 225, 255],
+];
+
 export type Gesture = "coucou" | "bravo" | "etire" | "saut" | "clin" | "epaules" | "attrape" | "baille";
 export type BadgeKind = "dots" | "bang" | "question";
 
@@ -139,6 +144,8 @@ export class BotEngine {
   private badgeS = new Spring(0, 0.3, 0.6);
   private float = 0;
 
+  /** Focus progress 0…1 drawn as a ring around Nooky; -1 = off. */
+  focusRing = -1;
   private tint: RGB = [0, 0, 0];
   private tintA = 0;
   private blush = 0;
@@ -562,6 +569,10 @@ export class BotEngine {
     if (tc) {
       this.tint = tc;
       this.tintA += (0.5 - this.tintA) * 0.06;
+    } else if (!this.tiny) {
+      // Humeur du jour: a faint tint that changes with the weekday.
+      this.tint = MOOD[new Date().getDay()];
+      this.tintA += (0.22 - this.tintA) * 0.06;
     } else {
       this.tintA += (0 - this.tintA) * 0.06;
       if (this.tintA < 0.004) this.tintA = 0;
@@ -626,6 +637,21 @@ export class BotEngine {
     const cx = W / 2 + this.ox.value * R;
     const base = H / 2 + this.particleOverhang / 2 - CLOUD_CENTER_Y * R;
     const cy = base + (this.oy.value + this.float) * R;
+
+    if (!tiny && this.focusRing >= 0) {
+      x.save();
+      x.lineWidth = Math.max(2, R * 0.07);
+      x.lineCap = "round";
+      x.strokeStyle = "rgba(255,255,255,.14)";
+      x.beginPath();
+      x.arc(cx, cy, R * 1.12, 0, Math.PI * 2);
+      x.stroke();
+      x.strokeStyle = "rgba(120,200,255,.9)";
+      x.beginPath();
+      x.arc(cx, cy, R * 1.12, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * this.focusRing);
+      x.stroke();
+      x.restore();
+    }
 
     // Ground shadow (never in the notch), with a hint of the pro/perso accent.
     if (!tiny && this.ground) {
