@@ -10,6 +10,7 @@ mod secrets;
 mod settings;
 mod sync;
 mod tray;
+mod weather;
 
 use std::sync::atomic::Ordering;
 use std::sync::{Arc, Mutex};
@@ -414,6 +415,7 @@ pub fn run() {
             local_get,
             local_set,
             open_settings_window,
+            weather::weather_get,
         ])
         .setup(move |app| {
             // A menu-bar app on macOS: no Dock icon, no app menu (Info.plist
