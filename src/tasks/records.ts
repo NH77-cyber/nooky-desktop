@@ -129,6 +129,16 @@ export function nextMeeting(events: AgendaEvent[], now = new Date(), withinMin =
   return best;
 }
 
+/** The meeting in progress (no end time is known: it counts as one hour long). */
+export function inMeeting(events: AgendaEvent[], now = new Date()): AgendaEvent | null {
+  for (const e of events) {
+    if (!e.meeting || !e.time) continue;
+    const start = new Date(`${e.date}T${e.time}:00`).getTime();
+    if (now.getTime() >= start && now.getTime() < start + 60 * 60_000) return e;
+  }
+  return null;
+}
+
 export function toEvent(r: Rec): AgendaEvent | null {
   if (r.deleted === true) return null;
   const title = str(r.title).trim();
