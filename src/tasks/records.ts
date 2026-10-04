@@ -111,6 +111,22 @@ export interface AgendaEvent {
   time: string | null;
   kind: EventKind;
   remindDaysBefore: number;
+  /** A calendar meeting (written by the planned agenda task): reminded 15 min before. */
+  meeting?: boolean;
+  location?: string;
+}
+
+/** The next meeting today that starts within `withinMin` minutes (and has not started more than 2 min ago). */
+export function nextMeeting(events: AgendaEvent[], now = new Date(), withinMin = 180): { e: AgendaEvent; min: number } | null {
+  let best: { e: AgendaEvent; min: number } | null = null;
+  for (const e of events) {
+    if (!e.meeting || !e.time) continue;
+    const start = new Date(`${e.date}T${e.time}:00`).getTime();
+    const min = Math.ceil((start - now.getTime()) / 60_000);
+    if (min < -2 || min > withinMin) continue;
+    if (!best || min < best.min) best = { e, min };
+  }
+  return best;
 }
 
 export function toEvent(r: Rec): AgendaEvent | null {
@@ -122,6 +138,8 @@ export function toEvent(r: Rec): AgendaEvent | null {
   return {
     key: r.key, title, date: r.date, time: isTime(r.time) ? r.time : null, kind,
     remindDaysBefore: Number.isFinite(n) && n >= 0 ? Math.min(60, Math.round(n)) : 1,
+    meeting: r.meeting === true,
+    location: str(r.location).trim(),
   };
 }
 
