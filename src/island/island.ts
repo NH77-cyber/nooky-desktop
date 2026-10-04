@@ -25,6 +25,7 @@ import { PauseInfo } from "../views/cards";
 import { askAbout } from "../views/chat";
 import type { Task } from "../tasks/oplog";
 import { timeLabel } from "../tasks/parse";
+import { nextMeeting } from "../tasks/records";
 import { Updates } from "../core/updates";
 
 const BOT_OVERHANG = 40;
@@ -732,7 +733,7 @@ export class Island {
       if (State.mode === "hidden") this.fsm.mouseEntered();
     });
 
-    window.setInterval(() => State.notify(), 30_000);
+    window.setInterval(() => State.notify(), 6_000);
     window.addEventListener("mousemove", () => {
       if (State.sleepy) {
         State.lastActivity = performance.now();
@@ -1088,9 +1089,17 @@ export class Island {
     this.compactCount.textContent = p.total ? `${p.done}/${p.total}` : "";
     this.compactCount.classList.toggle("all", p.total > 0 && p.done === p.total);
     const next = Tasks.lists(undefined, mode).open[0];
-    this.compactNext.textContent = !Geo.hasNotch && next
-      ? `${next.time ? `${timeLabel(next.time)} · ` : ""}${next.title}`
-      : "";
+    // The reduced text rotates: next task, next meeting, unread mail. A meeting under 15 min takes over.
+    const items: string[] = [];
+    if (next) items.push(`${next.time ? `${timeLabel(next.time)} · ` : ""}${next.title}`);
+    const meet = nextMeeting(Tasks.events());
+    if (meet) items.push(meet.min <= 15 ? `Réunion dans ${Math.max(0, meet.min)} min · ${meet.e.title}` : `${timeLabel(meet.e.time!)} · ${meet.e.title}`);
+    const unread = Tasks.unreadMails().length;
+    if (unread) items.push(`${unread} mail${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`);
+    const urgent = !!meet && meet.min <= 15;
+    const shown = urgent ? items[next ? 1 : 0] : items[Math.floor(Date.now() / 6000) % Math.max(1, items.length)];
+    this.compactNext.textContent = !Geo.hasNotch && shown ? shown : "";
+    this.compactNext.classList.toggle("urgent", urgent);
   }
 
   /** Applies settings coming from Rust at boot or from the settings window. */
