@@ -167,6 +167,7 @@ export const Bridge = {
   caughtText: (path: string) => callOrThrow<string>("caught_text", { path }),
 
   // ── This device's own little state (never synced) ─────────────────────────
+  weather: (city: string) => call<string>("weather_get", { city }),
   localGet: <T>(key: string) => call<T>("local_get", { key }),
   localSet: (key: string, value: unknown) => call<void>("local_set", { key, value }),
 };
