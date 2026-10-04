@@ -732,6 +732,14 @@ export class Island {
       if (State.mode === "hidden") this.fsm.mouseEntered();
     });
 
+    window.setInterval(() => State.notify(), 30_000);
+    window.addEventListener("mousemove", () => {
+      if (State.sleepy) {
+        State.lastActivity = performance.now();
+        this.engine.triggerEmote("surprised", 1);
+        State.notify();
+      } else State.lastActivity = performance.now();
+    });
     this.islandEl.addEventListener("mousedown", (e) => {
       Sound.resume();
       State.lastActivity = performance.now();
@@ -1064,6 +1072,7 @@ export class Island {
     this.compactInfo.classList.toggle("notch", Geo.hasNotch);
     const focusing = Focus.active;
     this.compactInfo.classList.toggle("focus", focusing);
+    if (!focusing) this.engine.focusRing = -1;
     if (!show) return;
     if (focusing) {
       const min = Focus.remainingMin();
@@ -1071,6 +1080,7 @@ export class Island {
       this.compactCount.classList.remove("all");
       this.compactNext.textContent = Geo.hasNotch ? "" : "Concentration";
       (this.focusBar.firstChild as HTMLElement).style.width = `${(Focus.progress() * 100).toFixed(2)}%`;
+      this.engine.focusRing = Focus.progress();
       return;
     }
     const mode = Mode.current();
