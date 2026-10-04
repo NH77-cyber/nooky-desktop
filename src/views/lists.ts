@@ -171,7 +171,7 @@ export function buildAgenda(actions: ViewActions): ViewHost {
     sync() {
       const today = dayKey();
       const evs = upcoming(Tasks.events(), today, 14);
-      const k = JSON.stringify([today, evs.map((e) => [e.key, e.title, e.date, e.time, rm.is(e.key)])]);
+      const k = JSON.stringify([today, evs.map((e) => [e.key, e.title, e.date, e.time, e.location, rm.is(e.key)])]);
       if (k === key) return;
       key = k;
       clear(list);
@@ -196,7 +196,7 @@ export function buildAgenda(actions: ViewActions): ViewHost {
         }
         ul!.append(h("li", { class: `task${rm.is(e.key) ? " armed" : ""}` },
           h("span", { class: "ag-time", text: e.time ? timeLabel(e.time) : "" }),
-          h("span", { class: "tt", text: e.title, title: e.title }),
+          h("span", { class: "tt", text: e.location ? `${e.title} · ${e.location}` : e.title, title: e.title }),
           h("span", { class: "tags" }, EVENT_KIND_LABEL[e.kind] ? h("span", { class: `tag ev-${e.kind}`, text: EVENT_KIND_LABEL[e.kind] }) : null),
           h("span", { class: "ta" }, rm.button(e.key, () => void Tasks.removeEvent(e.key))),
         ));
