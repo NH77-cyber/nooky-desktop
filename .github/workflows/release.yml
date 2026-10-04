@@ -1,0 +1,107 @@
+# Construit Nooky pour macOS (Apple silicon) et Windows, publie une Release
+# GitHub et le fichier latest.json lu par la mise à jour automatique.
+# Lancement : onglet Actions → « Construire Nooky » → Run workflow
+# (ou en poussant un tag v0.x.y).
+name: Construire Nooky
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: construire-nooky
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Nooky ${{ matrix.label }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: macOS (Apple silicon)
+            platform: macos-latest
+            args: --target aarch64-apple-darwin
+            rust_targets: aarch64-apple-darwin
+          - label: Windows
+            platform: windows-latest
+            args: ""
+            rust_targets: ""
+    runs-on: ${{ matrix.platform }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - name: Vérifier les secrets
+        shell: bash
+        run: |
+          missing=""
+          [ -z "$TAURI_SIGNING_PRIVATE_KEY" ] && missing="$missing TAURI_SIGNING_PRIVATE_KEY"
+          [ -z "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" ] && missing="$missing TAURI_SIGNING_PRIVATE_KEY_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error title=Secrets manquants::Il manque le(s) secret(s) :$missing. Ajoute-les dans Settings → Secrets and variables → Actions (voir GUIDE-GITHUB.md, étape c), puis relance."
+            exit 1
+          fi
+          echo "Les deux secrets sont bien là."
+
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Préparer la configuration de publication
+        shell: bash
+        run: |
+          node -e '
+            const fs = require("fs");
+            const p = "src-tauri/tauri.conf.json";
+            let s = fs.readFileSync(p, "utf8").split("__GITHUB_REPOSITORY__").join(process.env.REPO);
+            const c = JSON.parse(s);
+            c.bundle.createUpdaterArtifacts = true;
+            fs.writeFileSync(p, JSON.stringify(c, null, 2));
+            console.log("Mises à jour lues sur :", c.plugins.updater.endpoints[0]);
+          '
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Installer Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.platform }}-${{ matrix.rust_targets }}
+
+      - name: Installer les dépendances de l'interface
+        run: npm ci
+
+      - name: Construire et publier
+        uses: tauri-apps/tauri-action@v0
+        with:
+          tagName: v__VERSION__
+          releaseName: Nooky v__VERSION__
+          releaseBody: |
+            Nouvelle version de Nooky.
+
+            **Installer**
+            - Mac (Apple silicon) : télécharge le fichier `.dmg` qui contient `aarch64`, ouvre-le et glisse Nooky dans Applications.
+            - Windows : télécharge le fichier qui finit par `-setup.exe` et lance-le.
+
+            **Déjà installé ?** Nooky se met à jour tout seul : il te le propose en haut de l'écran (« Installer et relancer »).
+            Tu peux aussi passer par l'icône nuage → « Rechercher une mise à jour… ».
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+          args: ${{ matrix.args }}
