@@ -141,8 +141,11 @@ class SoundEngine {
     this.enabled = on;
   }
 
+  /** Quiet mode (a meeting is in progress): nothing plays. */
+  discreet = false;
+
   play(name: SoundName | string) {
-    if (!this.enabled) return;
+    if (!this.enabled || this.discreet) return;
     const notes = SOUNDS[name];
     if (!notes) return;
     const ctx = this.ensure();
