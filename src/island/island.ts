@@ -26,6 +26,7 @@ import { askAbout } from "../views/chat";
 import type { Task } from "../tasks/oplog";
 import { timeLabel } from "../tasks/parse";
 import { inMeeting, nextMeeting } from "../tasks/records";
+import { refreshWeather, weatherText } from "../core/weather";
 import { Updates } from "../core/updates";
 
 const BOT_OVERHANG = 40;
@@ -1097,6 +1098,9 @@ export class Island {
     if (live) items.push(`En réunion · ${live.title}`);
     const meet = nextMeeting(Tasks.events());
     if (meet && !live) items.push(meet.min <= 15 ? `Réunion dans ${Math.max(0, meet.min)} min · ${meet.e.title}` : `${timeLabel(meet.e.time!)} · ${meet.e.title}`);
+    refreshWeather(Tasks.prefs.ville);
+    const wx = weatherText();
+    if (wx) items.push(wx);
     const unread = Tasks.unreadMails().length;
     if (unread) items.push(`${unread} mail${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`);
     const urgent = !!meet && meet.min <= 15;
