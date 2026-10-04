@@ -12,7 +12,7 @@ import { hello } from "../core/state";
 import type { IslandViewName } from "../core/layout";
 import { carriedLabel, type Task } from "./oplog";
 import { addDays, dayKey, nowHM, timeLabel } from "./parse";
-import { daysUntil, effectiveRenewal, euros, whenLabel } from "./records";
+import { daysUntil, effectiveRenewal, euros, nextMeeting, whenLabel } from "./records";
 import { Tasks } from "./store";
 
 /** A card the island shows for a subscription, a trial, an event. */
@@ -120,6 +120,7 @@ export async function checkReminders(hooks: ReminderHooks, now = new Date()) {
 
   // Agenda: remindDaysBefore days ahead.
   for (const e of Tasks.events()) {
+    if (e.meeting) continue; // meetings have their own 15-minute reminder
     const d = daysUntil(e.date, today);
     if (d >= 0 && d <= e.remindDaysBefore) {
       once(`ev:${e.key}@${e.date}`, () => {
@@ -128,6 +129,16 @@ export async function checkReminders(hooks: ReminderHooks, now = new Date()) {
         notice({ label: "Agenda", title: `${e.title}, ${when}`, sub: "Je te le rappelle pour que rien ne t'échappe.", view: "agenda" });
       });
     }
+  }
+
+  // Meetings: 15 minutes before the start.
+  const soon = nextMeeting(Tasks.events(), now, 15);
+  if (soon && soon.min >= 0) {
+    once(`meet:${soon.e.key}@${soon.e.date}T${soon.e.time}`, () => {
+      const when = soon.min <= 1 ? "maintenant" : `dans ${soon.min} min`;
+      notifySoft("Réunion", `${soon.e.title}, ${when}.`, true);
+      notice({ label: "Réunion", title: `${soon.e.title}, ${when}`, sub: soon.e.location ? `Lieu : ${soon.e.location}` : `À ${timeLabel(soon.e.time!)}.`, view: "agenda" });
+    });
   }
 
   // Sac de demain: a gentle nudge at 19:30 when things are still unchecked.
