@@ -21,6 +21,8 @@ tauri-plugin-dialog = "2"
 # Self-update from GitHub Releases (signed), and relaunch after installing.
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
+# Ctrl+Space opens the chat from anywhere.
+tauri-plugin-global-shortcut = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
