@@ -228,6 +228,8 @@ export interface Prefs {
   streaming: string[];
   schoolZone: "A" | "B" | "C" | "";
   eveningRecap: string;
+  /** City for the weather line (empty = no weather). */
+  ville: string;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -237,6 +239,7 @@ export const DEFAULT_PREFS: Prefs = {
   streaming: [],
   schoolZone: "",
   eveningRecap: "18:00",
+  ville: "",
 };
 
 export function toPrefs(r: Rec | undefined): Prefs {
@@ -248,5 +251,6 @@ export function toPrefs(r: Rec | undefined): Prefs {
     streaming: strList(r.streaming),
     schoolZone: r.schoolZone === "A" || r.schoolZone === "B" || r.schoolZone === "C" ? r.schoolZone : "",
     eveningRecap: isTime(r.eveningRecap) ? r.eveningRecap : DEFAULT_PREFS.eveningRecap,
+    ville: str(r.ville).trim(),
   };
 }
