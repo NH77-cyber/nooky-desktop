@@ -25,7 +25,7 @@ import { PauseInfo } from "../views/cards";
 import { askAbout } from "../views/chat";
 import type { Task } from "../tasks/oplog";
 import { timeLabel } from "../tasks/parse";
-import { nextMeeting } from "../tasks/records";
+import { inMeeting, nextMeeting } from "../tasks/records";
 import { Updates } from "../core/updates";
 
 const BOT_OVERHANG = 40;
@@ -1092,8 +1092,11 @@ export class Island {
     // The reduced text rotates: next task, next meeting, unread mail. A meeting under 15 min takes over.
     const items: string[] = [];
     if (next) items.push(`${next.time ? `${timeLabel(next.time)} · ` : ""}${next.title}`);
+    const live = inMeeting(Tasks.events());
+    Sound.discreet = !!live;
+    if (live) items.push(`En réunion · ${live.title}`);
     const meet = nextMeeting(Tasks.events());
-    if (meet) items.push(meet.min <= 15 ? `Réunion dans ${Math.max(0, meet.min)} min · ${meet.e.title}` : `${timeLabel(meet.e.time!)} · ${meet.e.title}`);
+    if (meet && !live) items.push(meet.min <= 15 ? `Réunion dans ${Math.max(0, meet.min)} min · ${meet.e.title}` : `${timeLabel(meet.e.time!)} · ${meet.e.title}`);
     const unread = Tasks.unreadMails().length;
     if (unread) items.push(`${unread} mail${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`);
     const urgent = !!meet && meet.min <= 15;
