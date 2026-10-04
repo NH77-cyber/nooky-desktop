@@ -133,6 +133,7 @@ button {
   color: var(--ink-2);
 }
 
+#compact-info .cc-next.urgent { color: #ffb86b; font-weight: 600; }
 #compact-info .cc-next {
   flex: 1 1 auto;
   min-width: 0;
