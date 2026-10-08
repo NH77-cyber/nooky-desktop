@@ -303,6 +303,7 @@ export function buildHeader(actions: ViewActions): ViewHost {
   });
   const gearBtn = h("button", { title: "Réglages", onclick: () => actions.openSettingsWindow() }, svg(ICONS.gear, 14));
   const soundBtn = h("button", { title: "Sons", onclick: () => actions.toggleSound() }, svg(ICONS.speakerOn, 14));
+  const collapseBtn = h("button", { title: "Réduire", onclick: () => actions.collapse() }, svg(ICONS.chevronUp, 16));
 
   function go(v: IslandViewName) {
     actions.blip();
@@ -324,7 +325,7 @@ export function buildHeader(actions: ViewActions): ViewHost {
     { id: "header" },
     h("div", { class: "tabs" }, tabHome, tabTasks, tabChat, tabBrief, tabMore),
     menu,
-    h("div", { class: "header-actions" }, modeChip, gearBtn, soundBtn),
+    h("div", { class: "header-actions" }, modeChip, gearBtn, soundBtn, collapseBtn),
   );
 
   let soundKey = "";
