@@ -1,4 +1,4 @@
-// The welcome card (first launch: prénom + lien de la maison), the update
+// The welcome card (first launch: prénom + lien du bureau), the update
 // card, the evening recap, the end-of-focus "Pause !" card and the notice card
 // (subscriptions, trials, agenda). Nooky Desktop — original code.
 
@@ -16,7 +16,7 @@ export function buildWelcome(actions: ViewActions): ViewHost {
     type: "text", class: "field", placeholder: "Ton prénom", maxlength: "40", spellcheck: "false",
   }) as HTMLInputElement;
   const link = h("input", {
-    type: "text", class: "field", placeholder: "Lien de la maison (facultatif)", spellcheck: "false",
+    type: "text", class: "field", placeholder: "Lien du bureau (facultatif)", spellcheck: "false",
   }) as HTMLInputElement;
   const err = h("div", { class: "wc-err" });
   const submit = () => {

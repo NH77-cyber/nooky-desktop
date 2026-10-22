@@ -176,7 +176,7 @@ export function buildAgenda(actions: ViewActions): ViewHost {
       key = k;
       clear(list);
       if (!evs.length) {
-        list.append(h("div", { class: "empty", text: "Rien dans les 14 prochains jours. La maison peut aussi en ajouter (école, anniversaires…)." }));
+        list.append(h("div", { class: "empty", text: "Rien dans les 14 prochains jours. Le bureau peut aussi en ajouter (école, anniversaires…)." }));
         return;
       }
       let day = "";
@@ -271,7 +271,7 @@ export function buildMail(actions: ViewActions): ViewHost {
       count.textContent = unread ? `${unread} non lu${unread > 1 ? "s" : ""}` : mails.length ? "tout est lu" : "";
       allRead.style.display = unread ? "" : "none";
       clear(list);
-      if (!mails.length) list.append(h("li", { class: "empty", text: "Pas de courrier ces 30 derniers jours. Les messages de la maison et des tâches planifiées arrivent ici." }));
+      if (!mails.length) list.append(h("li", { class: "empty", text: "Pas de courrier ces 30 derniers jours. Les messages du bureau et des tâches planifiées arrivent ici." }));
       for (const m of mails) {
         const read = Tasks.isRead(m);
         const when = m.at ? new Date(m.at) : null;
@@ -281,7 +281,7 @@ export function buildMail(actions: ViewActions): ViewHost {
         const li = h("li", { class: `mail-row${read ? " read" : ""}${m.important ? " important" : ""}${open === m.id ? " open" : ""}` },
           h("div", { class: "mr-line" },
             h("i", { class: "mr-dot" }),
-            h("span", { class: "mr-from", text: m.from || "Maison" }),
+            h("span", { class: "mr-from", text: m.from || "Bureau" }),
             h("span", { class: "mr-title", text: m.title, title: m.title }),
             h("span", { class: "mr-when", text: whenText })),
           open === m.id && m.body ? h("div", { class: "mr-body", text: m.body }) : null,

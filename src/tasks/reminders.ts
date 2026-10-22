@@ -161,7 +161,7 @@ export async function checkReminders(hooks: ReminderHooks, now = new Date()) {
   for (const m of Tasks.mails) {
     if (mailSeen.has(m.id)) continue;
     mailSeen.add(m.id);
-    if (m.important && !Tasks.isRead(m)) notifySoft(`Courrier · ${m.from || "Maison"}`, m.title, true);
+    if (m.important && !Tasks.isRead(m)) notifySoft(`Courrier · ${m.from || "Bureau"}`, m.title, true);
   }
 
   persist();

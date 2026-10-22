@@ -7,7 +7,7 @@ export interface ChatMessage {
   id: number;
   role: "user" | "assistant" | "note";
   content: string;
-  /** A small action under a note ("Annuler", "Ajouter ces 3 tâches", "Ouvrir la maison"). */
+  /** A small action under a note ("Annuler", "Ajouter ces 3 tâches", "Ouvrir le bureau"). */
   action?: { label: string; run: () => void };
   /** Rendered as simple markdown (bridge answers). */
   markdown?: boolean;
@@ -36,7 +36,7 @@ export interface Settings {
   firstName: string;
   /** "Ce que Nooky doit savoir sur toi" — appended to the chat's system prompt. */
   aboutMe: string;
-  /** "Lien de la maison" — the overview button is hidden when empty. */
+  /** "Lien du bureau" — the overview button is hidden when empty. */
   maisonUrl: string;
 }
 
@@ -67,7 +67,7 @@ export function hello(now = new Date()): string {
   return name ? `${word} ${name} !` : `${word} !`;
 }
 
-/** The "Lien de la maison", if it is a web link. */
+/** The "Lien du bureau", if it is a web link. */
 export function maisonUrl(): string | null {
   const u = (State.settings.maisonUrl ?? "").trim();
   return /^https?:\/\/\S+$/i.test(u) ? u : null;

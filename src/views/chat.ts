@@ -195,7 +195,7 @@ async function viaBridge(text: string, quick: QuickKind | null, canFallback = fa
     State.pendingAsk = { id, since: Date.now(), closedNoted: false };
     pendingQuick = quick;
     pendingFallback = canFallback ? { query: text, quick } : null;
-    push("note", "Nooky transmet ta question à la maison…");
+    push("note", "Nooky transmet ta question au bureau…");
     State.stateOverride = "thinking";
   } catch (err) {
     push("note", `Je n'ai pas pu transmettre ta question : ${String(err).replace(/^Error:\s*/, "")}`);
@@ -241,14 +241,14 @@ function checkBridge() {
     pendingFallback = null;
     if (fb && State.hasApiKey) {
       pendingQuick = null;
-      push("note", "La maison ne répond pas : j'utilise ta clé API.");
+      push("note", "Le bureau ne répond pas : j'utilise ta clé API.");
       void viaKey(fb.query, null, fb.quick);
       return;
     }
     if (State.stateOverride === "thinking") State.stateOverride = null;
     const url = maisonUrl();
-    push("note", "La maison ne répond pas. Ouvre-la dans ton navigateur : elle répond dès qu'elle est ouverte, même en arrière-plan. Tu peux aussi ajouter une clé API.",
-      url ? { action: { label: "Ouvrir la maison", run: () => act?.openUrl(url) } } : { action: { label: "Ajouter une clé", run: () => act?.openSettingsWindow() } });
+    push("note", "Le bureau ne répond pas. Ouvre-le dans ton navigateur : il répond dès qu'elle est ouverte, même en arrière-plan. Tu peux aussi ajouter une clé API.",
+      url ? { action: { label: "Ouvrir le bureau", run: () => act?.openUrl(url) } } : { action: { label: "Ajouter une clé", run: () => act?.openSettingsWindow() } });
     act?.emote("yawn");
     done();
   }
@@ -272,14 +272,14 @@ export async function ask(query: string, opts: { quick?: QuickKind; context?: Ch
     return;
   }
   if (!bridgeReachable) {
-    push("note", "Cet ordinateur n'est pas relié à ton Google Drive, donc je ne peux pas joindre la maison. Installe Google Drive pour ordinateur (ou choisis le dossier Nooky dans les Réglages), ou ajoute une clé API.",
+    push("note", "Cet ordinateur n'est pas relié à ton Google Drive, donc je ne peux pas joindre le bureau. Installe Google Drive pour ordinateur (ou choisis le dossier Nooky dans les Réglages), ou ajoute une clé API.",
       { action: { label: "Ouvrir les Réglages", run: () => act?.openSettingsWindow() } });
     act?.emote("annoyed");
     done();
     return;
   }
   if (State.pendingAsk && !State.pendingAsk.closedNoted) {
-    push("note", "J'attends encore la réponse de la maison à ta question précédente.");
+    push("note", "J'attends encore la réponse du bureau à ta question précédente.");
     done();
     return;
   }
@@ -310,7 +310,7 @@ export async function askAbout(kind: QuickKind) {
     await ask(`${q.prompt}\n\nFichier « ${file.name} » :\n${content}`, { quick: kind, context: null, shown: `${q.label} · ${file.name}` });
   } catch (err) {
     push("user", `${q.label} · ${file.name}`);
-    push("note", `Sans clé API, je ne peux transmettre à la maison que le texte des fichiers texte de 20 Ko au plus (${String(err).replace(/^Error:\s*/, "")}). Ajoute une clé API pour les PDF, les images et les gros fichiers.`,
+    push("note", `Sans clé API, je ne peux transmettre au bureau que le texte des fichiers texte de 20 Ko au plus (${String(err).replace(/^Error:\s*/, "")}). Ajoute une clé API pour les PDF, les images et les gros fichiers.`,
       { action: { label: "Ajouter une clé", run: () => act?.openSettingsWindow() } });
     act?.emote("annoyed");
     done();
@@ -322,7 +322,7 @@ export function buildPrompt(actions: ViewActions, onHeightChange: () => void): V
   heightChanged = onHeightChange;
   const chipRow = h("div", { class: "chip-row" });
   const log = h("div", { class: "chat-log" });
-  const nokeyText = h("span", { text: "Je passe d'abord par la maison (gratuit, elle doit être ouverte). Une clé API sert de secours." });
+  const nokeyText = h("span", { text: "Je passe d'abord par le bureau (gratuit, il doit être ouvert). Une clé API sert de secours." });
   const nokey = h(
     "div",
     { class: "nokey" },

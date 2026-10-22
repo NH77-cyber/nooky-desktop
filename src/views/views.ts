@@ -43,7 +43,7 @@ export interface ViewActions {
   reminderDone(): void;
   reminderSnooze(): void;
   reminderLater(): void;
-  /** Welcome card: save the prénom and the lien de la maison. */
+  /** Welcome card: save the prénom and the lien du bureau. */
   saveWelcome(firstName: string, maisonUrl: string): void;
   dismissWelcome(): void;
   installUpdate(): void;
@@ -415,7 +415,7 @@ function buildOverview(actions: ViewActions): ViewHost {
   const focusRow = h("div", { class: "fx-row" }, f25, f50);
   const focusStop = btn("Arrêter", "ghost", () => actions.stopFocus());
   const focusBox = h("div", { class: "fx-box" }, focusLabel, focusRow, focusStop);
-  const maisonBtn = btn("Ouvrir la maison", "ghost", () => {
+  const maisonBtn = btn("Ouvrir le bureau", "ghost", () => {
     const url = maisonUrl();
     if (url) actions.openUrl(url);
   }, ICONS.arrowUpRight);
