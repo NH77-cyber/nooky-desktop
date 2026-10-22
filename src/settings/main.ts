@@ -134,7 +134,7 @@ function rhythmSection(): HTMLElement {
     "section",
     {},
     h("h2", {}, h("span", { text: "Rythme et loisirs" })),
-    h("div", { class: "hint", text: "Partagé avec la maison et les tâches planifiées, via le dossier de synchronisation." }),
+    h("div", { class: "hint", text: "Partagé avec le bureau et les tâches planifiées, via le dossier de synchronisation." }),
     h("div", { class: "row" }, h("label", { text: "Heures pro" }), days),
     h("div", { class: "row" }, h("label", { text: "" }), h("span", { class: "hint", text: "de" }), start, h("span", { class: "hint", text: "à" }), end),
     h("div", { class: "hint small", text: "Pendant ces heures Nooky passe en mode pro (ambre), sinon en perso (menthe). Le bouton en haut de l'île bascule à la main jusqu'au prochain changement." }),
@@ -186,13 +186,13 @@ function youSection(): HTMLElement {
         void save();
         return null;
       }, true),
-    textSetting("Lien de la maison", settings.maisonUrl ?? "", "https://…", (v) => {
+    textSetting("Lien du bureau", settings.maisonUrl ?? "", "https://…", (v) => {
       if (v && !/^https?:\/\/\S+$/i.test(v)) return "Le lien doit commencer par https://";
       settings.maisonUrl = v;
       void save();
       return null;
     }),
-    h("div", { class: "hint", text: "Sans lien, le bouton « Ouvrir la maison » n'apparaît pas." }),
+    h("div", { class: "hint", text: "Sans lien, le bouton « Ouvrir le bureau » n'apparaît pas." }),
   );
 }
 
